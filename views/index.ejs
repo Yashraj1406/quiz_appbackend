@@ -1,0 +1,13 @@
+
+<h1>Questions</h1>
+<h2><%= Question.title %></h2>
+
+<form method="post" action="/submit">
+    <label>Options</label><br>
+    <% opt.forEach(function(option){ %>
+        <input type="radio" name="text" value="<%= option %>"/><%= option %>
+        <br>
+    <% }) %>
+    <input type="submit" value="Submit" />
+</form>
+
