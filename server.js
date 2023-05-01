@@ -43,6 +43,13 @@ app.get('/:category/:questionId/:optionId', (req, res) => {
   const session = driver.session({ database: 'neo4j' }); // Create a new session
   session.run(query, { questions: questions,questionId: questionId, optionId: optionId })
   .then((result) => {
+    if (result.records.length === 0) {
+      // Handle case when no records are found
+      res.status(404).json({
+        error: "No records found",
+      });
+      return;
+    }
     var question = {
       id: result.records[0]._fields[0].identity.low,
       questionNumber:result.records[0]._fields[0].properties.questionId.low,
@@ -93,6 +100,13 @@ app.get('/:category', (req,res) => {
 
   session.run(query, { questions, questionId })
   .then((result) => {
+    if (result.records.length === 0) {
+      // Handle case when no records are found
+      res.status(404).json({
+        error: "No records found",
+      });
+      return;
+    }
     var question = {
       id: result.records[0]._fields[0].identity.low,
       questionNumber:result.records[0]._fields[0].properties.questionId.low,
