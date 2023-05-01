@@ -56,7 +56,7 @@ app.get('/:category/:questionId/:optionId', (req, res) => {
       optionBCsc: result.records[0]._fields[0].properties.optionBCsc,
       optionCCsc: result.records[0]._fields[0].properties.optionCCsc,
       optionDCsc: result.records[0]._fields[0].properties.optionDCsc,
-      optionECsc: result.records[0]._fields[0].properties.optionECsc.low,
+      optionECsc: result.records[0]._fields[0].properties.optionECsc,
     };
     if (req.headers.accept.includes('application/json')) {
       res.status(200).json({
@@ -106,7 +106,7 @@ app.get('/:category', (req,res) => {
       optionBCsc: result.records[0]._fields[0].properties.optionBCsc,
       optionCCsc: result.records[0]._fields[0].properties.optionCCsc,
       optionDCsc: result.records[0]._fields[0].properties.optionDCsc,
-      optionECsc: result.records[0]._fields[0].properties.optionECsc.low,
+      optionECsc: result.records[0]._fields[0].properties.optionECsc,
     };
     if (req.headers.accept.includes('application/json')) {
       res.status(200).json({
