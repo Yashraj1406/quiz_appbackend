@@ -17,85 +17,165 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(express.static(path.join(__dirname, 'public')))
 
-const uri = 'neo4j+s://a1276673.databases.neo4j.io';
+const uri = 'neo4j+s://7fe5fc5b.databases.neo4j.io';
 const user = 'neo4j';
-const password = 'Lz5EZgnAqMfUFKlxBNY8Ze0I_CfKmEaAFj0JC22TP6Q';
+const password = 'bKGYRbvUvlxENnyeH6k4_6Y6bn1Qr1acIJlGBFKU0uk';
     
 // To learn more about the driver: https://neo4j.com/docs/javascript-manual/current/client-applications/#js-driver-driver-object
 const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 const session = driver.session({ database: 'neo4j' });
 
-var name = 1;
 
-app.get('/', (req, res) => {
-  let {questionText} = req.query;
-  if (!questionText) {
-    questionText = name;
-  }
-  session
-    .run('MATCH (n:Question {Question_id: $titleParam}) RETURN n',{titleParam:questionText})
-    .then(function(result){
-      var question = {
-        id:result.records[0]._fields[0].identity.low,
-        title:result.records[0]._fields[0].properties.Question_title,
-      }
-      session
-        .run('MATCH(:Question{Question_id: $titleParam})-[r]->() RETURN r',{titleParam:questionText})
-        .then(function(results){
-          var options = [];
-          results.records.forEach(function(record){
-            options.push(record._fields[0].properties.title)
-          })
-          if (req.headers.accept.includes('application/json')) {
-            res.status(200).json({
-              Question:question,
-              opt:options
-            });
-          } else {
-            res.render('index',{
-              Question:question,
-              opt:options
-            });
-          }  
-          // session.close();
-        })
-        .catch(function(err){
-          console.log(err)
-        })
-    })
-    .catch(function(err){
-      console.log(err)
-    })
+app.get('/:category/:questionId/:optionId', (req, res) => {
+  const category = req.params.category;
+  const questionId = req.params.questionId;
+  const optionId = req.params.optionId;
+  var questions = 'questions_AC';
+
+  console.log(category + " " + optionId);
+
+  if (category === "ns") questions = 'questions_NS';
+  if (category === "gc") questions = 'questions_GC';
+  if (category === "lg") questions = 'questions_LG';
+
+  const query = `MATCH (n:${questions} {questionId:${questionId}})-[r:\`${optionId}\`]->(m:${questions}) RETURN m`;
+
+  const session = driver.session({ database: 'neo4j' }); // Create a new session
+  session.run(query, { questions: questions,questionId: questionId, optionId: optionId })
+  .then((result) => {
+    var question = {
+      id: result.records[0]._fields[0].identity.low,
+      title: result.records[0]._fields[0].properties.questionTitle,
+      optionA: result.records[0]._fields[0].properties.optionA,
+      optionB: result.records[0]._fields[0].properties.optionB,
+      optionC: result.records[0]._fields[0].properties.optionC,
+      optionD: result.records[0]._fields[0].properties.optionD,
+      optionE: result.records[0]._fields[0].properties.optionE,
+      optionACsc: result.records[0]._fields[0].properties.optionACsc,
+      optionBCsc: result.records[0]._fields[0].properties.optionBCsc,
+      optionCCsc: result.records[0]._fields[0].properties.optionCCsc,
+      optionDCsc: result.records[0]._fields[0].properties.optionDCsc,
+      optionECsc: result.records[0]._fields[0].properties.optionECsc,
+    };
+    if (req.headers.accept.includes('application/json')) {
+      res.status(200).json({
+        Question: question,
+      });
+    } else {
+      res.render('index', {
+        Question: question,
+      });
+    }
   })
-
-// app.get('/ch', (req,res) => {
-
-// })
-
-app.post('/submit', (req, res) => {
-  var title = req.body.text;
-  // var year = req.body.year;
-  // console.log(title);
-  session
-    .run('MATCH(n:Question)-[r {title: $titleParam}]->(m:Question) RETURN m',{titleParam:title})
-    .then(function(result){
-      const nextQuestion = result.records[0]._fields[0].properties.Question_id;
-      if (req.headers.accept.includes('application/json')) {
-        res.status(200).json({
-          Question:nextQuestion,
-        });
-      } else {
-        name =  nextQuestion;
-        res.redirect('/')
-      }
-      // session.close();
-    })
-    .catch(function(err){
-      console.log(err)
-    })
-
+  .catch((err) => {
+    console.log(err);
+  })
+  .finally(() => {
+    session.close(); // Close the session
+  });
+    
 });
+
+
+app.get('/:category', (req,res) => {
+  const category = req.params.category;
+
+  var questions = 'questions_AC';
+  if (category === "ns") questions = 'questions_NS';
+  if (category === "gc") questions = 'questions_GC';
+  if (category === "lg") questions = 'questions_LG';
+
+  const questionId = 1;
+  const query = `MATCH (n:${questions} {questionId: $questionId}) RETURN n`;
+
+  const session = driver.session({ database: 'neo4j' }); // Create a new session
+
+  session.run(query, { questions, questionId })
+  .then((result) => {
+    var question = {
+      id: result.records[0]._fields[0].identity.low,
+      title: result.records[0]._fields[0].properties.questionTitle,
+      optionA: result.records[0]._fields[0].properties.optionA,
+      optionB: result.records[0]._fields[0].properties.optionB,
+      optionC: result.records[0]._fields[0].properties.optionC,
+      optionD: result.records[0]._fields[0].properties.optionD,
+      optionE: result.records[0]._fields[0].properties.optionE,
+      optionACsc: result.records[0]._fields[0].properties.optionACsc,
+      optionBCsc: result.records[0]._fields[0].properties.optionBCsc,
+      optionCCsc: result.records[0]._fields[0].properties.optionCCsc,
+      optionDCsc: result.records[0]._fields[0].properties.optionDCsc,
+      optionECsc: result.records[0]._fields[0].properties.optionECsc,
+    };
+    if (req.headers.accept.includes('application/json')) {
+      res.status(200).json({
+        Question: question,
+      });
+    } else {
+      res.render('index', {
+        Question: question,
+      });
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+})
+
+// app.post('/submit', (req, res) => {
+//   var title = req.body.text;
+//   // var year = req.body.year;
+//   // console.log(title);
+//   session
+//     .run('MATCH(n:question)-[r {title: $titleParam}]->(m:Question) RETURN m',{titleParam:title})
+//     .then(function(result){
+//       const nextQuestion = result.records[0]._fields[0].properties.Question_id;
+//       if (req.headers.accept.includes('application/json')) {
+//         res.status(200).json({
+//           Question:nextQuestion,
+//         });
+//       } else {
+//         res.redirect('/')
+//       }
+//       // session.close();
+//     })
+//     .catch(function(err){
+//       console.log(err)
+//     })
+
+// });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+
+  // let {questionText} = req.query;
+  // if (!questionText) {
+  //   questionText = name;
+  // }
+
+
+// session
+// .run('MATCH(:Question{Question_id: $titleParam})-[r]->() RETURN r',{titleParam:questionText})
+// .then(function(results){
+//   var options = [];
+//   results.records.forEach(function(record){
+//     options.push(record._fields[0].properties.title)
+//   })
+//   if (req.headers.accept.includes('application/json')) {
+//     res.status(200).json({
+//       Question:question,
+//       opt:options
+//     });
+//   } else {
+//     res.render('index',{
+//       Question:question,
+//       opt:options
+//     });
+//   }  
+//   // session.close();
+// })
+// .catch(function(err){
+//   console.log(err)
+// })

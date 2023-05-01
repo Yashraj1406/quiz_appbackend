@@ -4,10 +4,12 @@
 
 <form method="post" action="/submit">
     <label>Options</label><br>
-    <% opt.forEach(function(option){ %>
-        <input type="radio" name="text" value="<%= option %>"/><%= option %>
+        <input type="radio" name="text" value="<%= Question.optionA %>"/><%= Question.optionA %>
+        <input type="radio" name="text" value="<%= Question.optionB %>"/><%= Question.optionB %>
+        <input type="radio" name="text" value="<%= Question.optionC %>"/><%= Question.optionC %>
+        <input type="radio" name="text" value="<%= Question.optionD %>"/><%= Question.optionD %>
+        <input type="radio" name="text" value="<%= Question.optionE %>"/><%= Question.optionE %>
         <br>
-    <% }) %>
     <input type="submit" value="Submit" />
 </form>
 
