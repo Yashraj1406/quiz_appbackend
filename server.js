@@ -45,6 +45,7 @@ app.get('/:category/:questionId/:optionId', (req, res) => {
   .then((result) => {
     var question = {
       id: result.records[0]._fields[0].identity.low,
+      questionNumber:result.records[0]._fields[0].properties.questionId,
       title: result.records[0]._fields[0].properties.questionTitle,
       optionA: result.records[0]._fields[0].properties.optionA,
       optionB: result.records[0]._fields[0].properties.optionB,
@@ -94,6 +95,7 @@ app.get('/:category', (req,res) => {
   .then((result) => {
     var question = {
       id: result.records[0]._fields[0].identity.low,
+      questionNumber:result.records[0]._fields[0].properties.questionId,
       title: result.records[0]._fields[0].properties.questionTitle,
       optionA: result.records[0]._fields[0].properties.optionA,
       optionB: result.records[0]._fields[0].properties.optionB,
